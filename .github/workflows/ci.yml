@@ -1,73 +1,129 @@
-name: CI/CD Pipeline
+name: Advanced CI/CD Pipeline
 
 on:
   push:
     branches: ["main", "develop"]
   pull_request:
     branches: ["main", "develop"]
+  workflow_dispatch:     # Allows manual runs
 
 jobs:
 
-  # -----------------------------
-  # 1️⃣ BUILD JOB
-  # -----------------------------
+  # ---------------------------------------------------------
+  # 1️⃣ CODE QUALITY JOB (Lint + Format)
+  # ---------------------------------------------------------
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.10"
+
+      - name: Install linting tools
+        run: |
+          pip install ruff black flake8
+
+      - name: Run Ruff (fast linter)
+        run: ruff check src/ tests/
+
+      - name: Run Black (formatting check)
+        run: black --check src/ tests/
+
+      - name: Run Flake8
+        run: flake8 src/ tests/
+
+
+  # ---------------------------------------------------------
+  # 2️⃣ BUILD JOB (Matrix for multiple Python versions)
+  # ---------------------------------------------------------
   build:
     runs-on: ubuntu-latest
+    needs: lint
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.11", "3.12"]
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
 
-      - name: Set up Python
+      - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v6
         with:
-          python-version: "3.10"
+          python-version: ${{ matrix.python-version }}
 
-      - name: Install project and dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -e .
-          pip install -r requirements.txt || echo "No requirements.txt found"
-
-      - name: Verify build
-        run: |
-          python -c "import my_github_actions_demo; print('Build OK ✔')"
-
-
-  # -----------------------------
-  # 2️⃣ TEST JOB
-  # -----------------------------
-  test:
-    runs-on: ubuntu-latest
-    needs: build     # <-- ensures build runs first
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v6
-
-      - name: Set up Python
-        uses: actions/setup-python@v6
+      - name: Cache pip dependencies
+        uses: actions/cache@v4
         with:
-          python-version: "3.10"
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
 
       - name: Install project
         run: |
-          python -m pip install --upgrade pip
           pip install -e .
-          pip install pytest
+          pip install -r requirements.txt || true
 
-      - name: Run tests
-        run: pytest -q
+      - name: Verify import
+        run: my_github_actions_demo; print('Import OK')"
+
+      - name: Build artifact (optional)
+        run: python -m build
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist-${{ matrix.python-version }}
+          path: dist/
 
 
-  # -----------------------------
-  # 3️⃣ DEPLOY JOB
-  # -----------------------------
+  # ---------------------------------------------------------
+  # 3️⃣ TEST JOB (with coverage)
+  # ---------------------------------------------------------
+  test:
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.10"
+
+      - name: Install project and pytest + coverage
+        run: |
+          pip install -e .
+          pip install pytest coverage
+
+      - name: Run tests with coverage
+        run: |
+          coverage run -m pytest
+          coverage xml
+          coverage report
+
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage.xml
+
+
+  # ---------------------------------------------------------
+  # 4️⃣ DEPLOY JOB (only when tests pass)
+  # ---------------------------------------------------------
   deploy:
     runs-on: ubuntu-latest
-    needs: test      # <-- ensures deploy runs ONLY after test passes
-
-  
+    needs: test
+   
     if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop' # <-- deploy only from main and develop branch
 
     steps:
@@ -80,21 +136,26 @@ jobs:
           python-version: "3.10"
 
       - name: Install project
-        run: |
-          python -m pip install --upgrade pip
-          pip install -e .
+        run: pip install -e .
 
       - name: Deploy Application
         run: |
-          echo "🚀 Deploying application..."
-          # --------------------------------------
-          # PLACE YOUR DEPLOY COMMANDS HERE
-          # Examples:
-          # aws s3 sync dist/ s3://my-bucket
-          # aws ecs update-service ...
-          # terraform init && terraform apply -auto-approve
-          # docker build -t myimage .
-          # docker push myimage
-          # --------------------------------------
-
+          echo "🚀 Starting deployment..."
+          # 🔥 ADD YOUR DEPLOYMENT COMMANDS BELOW:
+          # Example AWS S3:
+          # aws s3 sync dist/ s3://my-bucket --delete
+          #
+          # Example ECS:
+          # aws ecs update-service --cluster myCluster --service myService --force-new-deployment
+          #
+          # Example Terraform:
+          # terraform init
+          # terraform apply -auto-approve
+          #
+          # Docker push:
+          # docker build -t myapp .
+          # docker push myapp
+          
           echo "🎉 Deployment completed!"
+
+
