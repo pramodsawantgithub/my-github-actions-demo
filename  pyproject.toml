@@ -1,0 +1,16 @@
+
+[project]
+name = "my_github_actions_demo"
+version = "0.1.0"
+description = "Demo project"
+requires-python = ">=3.10"
+
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
