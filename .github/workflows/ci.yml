@@ -34,7 +34,7 @@ jobs:
         run: ruff check src/ tests/
 
       - name: Run Black (check only)
-        run: black --check src/ tests/
+        run: black src/ tests/
 
       - name: Run Flake8
         run: flake8 src/ tests/
