@@ -73,8 +73,16 @@ jobs:
           pip install -e .
           pip install -r requirements.txt || true
 
-      - name: Verify import
-        run: my_github_actions_demo; print('Import OK')"
+      
+      - name: Verify import (heredoc)
+        run: |
+          python - <<'PY'
+          import sys
+          print(sys.version)
+          import my_github_actions_demo
+          print('Import OK')
+          PY
+
 
       - name: Build artifact (optional)
         run: python -m build
