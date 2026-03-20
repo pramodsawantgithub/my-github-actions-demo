@@ -70,10 +70,10 @@ jobs:
 
       - name: Install project
         run: |
+          pip install --upgrade pip
           pip install -e .
           pip install -r requirements.txt || true
 
-      
       - name: Verify import (heredoc)
         run: |
           python - <<'PY'
@@ -83,6 +83,9 @@ jobs:
           print('Import OK')
           PY
 
+      # ⭐ FIX: Install build package
+      - name: Install build tool
+        run: pip install build
 
       - name: Build artifact (optional)
         run: python -m build
