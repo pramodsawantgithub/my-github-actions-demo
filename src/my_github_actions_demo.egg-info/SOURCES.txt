@@ -1,0 +1,7 @@
+pyproject.toml
+src/my_github_actions_demo/app.py
+src/my_github_actions_demo.egg-info/PKG-INFO
+src/my_github_actions_demo.egg-info/SOURCES.txt
+src/my_github_actions_demo.egg-info/dependency_links.txt
+src/my_github_actions_demo.egg-info/top_level.txt
+tests/test_app.py

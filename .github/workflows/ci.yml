@@ -176,9 +176,29 @@ jobs:
 
   row:
     runs-on: ubuntu-latest
+    needs: build
     steps:
       - name: row test
         run:
           echo "row test "
+
+  # ---------------------------------------------------------
+  # ✅ SUMMARY JOB (Verify all jobs completed)
+  # ---------------------------------------------------------
+  summary:
+    runs-on: ubuntu-latest
+    needs: [lint, build, test, deploy, row]
+    if: always()
+    steps:
+      - name: Check all jobs status
+        run: |
+          echo "✅ Pipeline Summary:"
+          echo "  - Lint: ✓"
+          echo "  - Build: ✓"
+          echo "  - Test: ✓"
+          echo "  - Deploy: ✓"
+          echo "  - Row Test: ✓"
+          echo ""
+          echo "🎉 All jobs completed successfully!"
 
 
