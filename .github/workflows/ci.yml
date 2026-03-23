@@ -173,3 +173,12 @@ jobs:
           echo "🎉 Deployment completed!"
 
 
+
+  row:
+    runs-on: ubuntu-latest
+    steps:
+      - name: row test
+        run:
+          echo "row test "
+
+
