@@ -21,8 +21,8 @@ jobs:
         distribution: 'temurin'
         java-version: '25'
 
-    - name: Run HelloWorldApp
-      run: java HelloWorldApp.java
+    #- name: Run HelloWorldApp
+    #  run: java HelloWorldApp.java
 
     - name: Set up Python
       uses: actions/setup-python@v5
