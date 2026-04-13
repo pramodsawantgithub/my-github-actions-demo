@@ -34,6 +34,19 @@ jobs:
     - name: Install dependencies
       run: |
         pip install -r requirements.txt
+         - name: Checkout repo
+        uses: actions/checkout@v6
+
+    - name: Set up Node
+      uses: actions/setup-node@v6
+      with:
+          node-version: 24
+
+    - name: Install Node dependencies
+      run: npm ci
+
+    - name: Run Node tests
+      run: npm test
 
     #- name: Run tests
      # env:
