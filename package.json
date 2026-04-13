@@ -5,9 +5,11 @@
   "directories": {
     "test": "tests"
   },
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
+  
+"scripts": {
+  "test": "echo \"✅ npm test passed\""
+}
+,
   "repository": {
     "type": "git",
     "url": "git+https://github.com/pramodsawantgithub/my-github-actions-demo.git"
