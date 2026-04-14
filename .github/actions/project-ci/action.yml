@@ -1,0 +1,57 @@
+name: Project CI Checks
+description: Reusable local action for Python and Node project checks
+
+inputs:
+  stack:
+    description: Project stack to validate
+    required: true
+  python-version:
+    description: Python version to use for Python checks
+    required: false
+    default: "3.10"
+  node-version:
+    description: Node.js version to use for Node checks
+    required: false
+    default: "24"
+
+runs:
+  using: composite
+  steps:
+    - name: Set up Python
+      if: ${{ inputs.stack == 'python' }}
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ inputs.python-version }}
+
+    - name: Install Python dependencies
+      if: ${{ inputs.stack == 'python' }}
+      shell: bash
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Run Python tests
+      if: ${{ inputs.stack == 'python' }}
+      shell: bash
+      run: pytest
+
+    - name: Set up Node
+      if: ${{ inputs.stack == 'node' }}
+      uses: actions/setup-node@v6
+      with:
+        node-version: ${{ inputs.node-version }}
+
+    - name: Install Node dependencies
+      if: ${{ inputs.stack == 'node' }}
+      shell: bash
+      run: npm ci
+
+    - name: Run Node script
+      if: ${{ inputs.stack == 'node' }}
+      shell: bash
+      run: node index.js
+
+    - name: Run Node tests
+      if: ${{ inputs.stack == 'node' }}
+      shell: bash
+      run: npm test
