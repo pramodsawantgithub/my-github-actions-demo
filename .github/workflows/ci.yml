@@ -1,4 +1,4 @@
-name: CI Pipeline
+name: Advanced CI/CD Pipeline
 
 on:
   push:

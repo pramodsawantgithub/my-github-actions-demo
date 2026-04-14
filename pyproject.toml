@@ -1,0 +1,55 @@
+[project]
+name = "my_github_actions_demo"
+version = "0.1.0"
+requires-python = ">=3.10"
+
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+# ---------------- Black ----------------
+[tool.black]
+line-length = 88
+target-version = ["py310"]
+include = '\.pyi?$'
+exclude = '''
+/(
+    \.git
+  | \.venv
+  | build
+  | dist
+)/
+'''
+
+# ---------------- Ruff -----------------
+[tool.ruff]
+line-length = 88
+target-version = "py310"
+exclude = [
+  ".git",
+  ".venv",
+  "build",
+  "dist",
+]
+
+[tool.ruff.lint]
+# pycodestyle (E), pyflakes (F), import sorting (I)
+select = ["E", "F", "I"]
+ignore = []
+
+# ---------------- Flake8 --------------
+[tool.flake8]
+max-line-length = 88
+extend-ignore = []
+exclude = [
+  ".git",
+  ".venv",
+  "build",
+  "dist",
+]
