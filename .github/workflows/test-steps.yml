@@ -1,0 +1,21 @@
+name: Test Steps
+on:
+  workflow_dispatch
+
+jobs:
+  test-step:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v6
+
+      - name: Run Node checks
+        uses: ./.github/actions/project-ci
+        with:
+          node-version: 24
+          stack: node
+
+       
+
+     

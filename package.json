@@ -1,0 +1,28 @@
+{
+  "name": "my-github-actions-demo",
+  "version": "1.0.0",
+  "main": "index.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "echo \"✅ npm test passed\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pramodsawantgithub/my-github-actions-demo.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/pramodsawantgithub/my-github-actions-demo/issues"
+  },
+  "homepage": "https://github.com/pramodsawantgithub/my-github-actions-demo#readme",
+  "description": "",
+  "dependencies": {
+    "@actions/core": "^3.0.0",
+    "@actions/exec": "^3.0.0",
+    "@actions/github": "^9.1.0"
+  }
+}
