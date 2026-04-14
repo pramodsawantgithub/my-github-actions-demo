@@ -26,6 +26,7 @@ runs:
     - name: Install Python dependencies
       if: ${{ inputs.stack == 'python' }}
       shell: bash
+      working-directory: ${{ github.workspace }}
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
@@ -33,6 +34,9 @@ runs:
     - name: Run Python tests
       if: ${{ inputs.stack == 'python' }}
       shell: bash
+      working-directory: ${{ github.workspace }}
+      env:
+        PYTHONPATH: ${{ github.workspace }}
       run: pytest
 
     - name: Set up Node
@@ -44,14 +48,17 @@ runs:
     - name: Install Node dependencies
       if: ${{ inputs.stack == 'node' }}
       shell: bash
+      working-directory: ${{ github.workspace }}
       run: npm ci
 
     - name: Run Node script
       if: ${{ inputs.stack == 'node' }}
       shell: bash
+      working-directory: ${{ github.workspace }}
       run: node index.js
 
     - name: Run Node tests
       if: ${{ inputs.stack == 'node' }}
       shell: bash
+      working-directory: ${{ github.workspace }}
       run: npm test
