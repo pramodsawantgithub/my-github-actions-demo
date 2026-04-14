@@ -32,3 +32,29 @@ jobs:
         with:
           node-version: "24"
           stack: node
+
+  dev:
+    if: ${{ github.event_name == 'pull_request' }}
+    needs: [python-checks, node-checks]
+    runs-on: ubuntu-latest
+    environment: development
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v6
+
+      - name: Dev deployment gate
+        run: echo "Development job passed after Python and Node checks"
+
+  prod:
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+    needs: [python-checks, node-checks]
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v6
+
+      - name: Prod deployment gate
+        run: echo "Production job passed after Python and Node checks"
