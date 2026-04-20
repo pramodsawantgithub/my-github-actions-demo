@@ -1,0 +1,7 @@
+# Default code owner for the repository
+* @pramodsawantgithub
+
+# CI and automation changes require owner review
+/.github/ @pramodsawantgithub
+/.github/workflows/ @pramodsawantgithub
+/.github/actions/ @pramodsawantgithub
