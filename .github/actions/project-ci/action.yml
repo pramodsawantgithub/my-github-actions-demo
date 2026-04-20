@@ -73,6 +73,18 @@ runs:
         pip install pytest-cov
         pytest --cov=src --cov-report=term-missing --cov-report=xml
 
+    - name: Post coverage comment on PR
+      if: ${{ inputs.stack == 'python' && inputs.run-coverage == 'true' && github.event_name == 'pull_request' }}
+      uses: MishaKav/pytest-coverage-comment@main
+      with:
+        pytest-xml-coverage-path: ./coverage.xml
+        title: "Python ${{ inputs.python-version }} Coverage Report"
+        badge-title: Coverage
+        hide-badge: false
+        hide-report: false
+        create-new-comment: false
+        hide-comment: false
+
     - name: Upload Python coverage
       if: ${{ inputs.stack == 'python' && inputs.run-coverage == 'true' }}
       uses: codecov/codecov-action@v3
