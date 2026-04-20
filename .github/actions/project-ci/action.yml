@@ -75,6 +75,11 @@ runs:
 
     - name: Post coverage comment on PR
       if: ${{ inputs.stack == 'python' && inputs.run-coverage == 'true' && github.event_name == 'pull_request' }}
+      shell: bash
+      run: echo "📊 Updating coverage report on PR..."
+
+    - name: Post coverage comment on PR
+      if: ${{ inputs.stack == 'python' && inputs.run-coverage == 'true' && github.event_name == 'pull_request' }}
       uses: MishaKav/pytest-coverage-comment@main
       with:
         pytest-xml-coverage-path: ./coverage.xml
