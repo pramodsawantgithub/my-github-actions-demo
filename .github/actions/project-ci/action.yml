@@ -139,4 +139,5 @@ runs:
     - name: Code review check message
       if: ${{ github.event_name == 'pull_request' }}
       shell: bash
-      run: echo "Test message: CODEOWNERS review check triggered for this pull request."
+      run: |
+        echo "Test message: CODEOWNERS review check triggered for this pull request."
