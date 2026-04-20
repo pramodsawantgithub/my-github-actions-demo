@@ -62,7 +62,7 @@ jobs:
           echo "✅ All CI checks passed"
 
   dev:
-    if: ${{ github.event_name == 'pull_request' }}
+    if: ${{ github.event_name == 'pull_request' && github.base_ref == 'develop' }}
     needs: [python-checks, node-checks]
     runs-on: ubuntu-latest
     environment: development
