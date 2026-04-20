@@ -1,5 +1,5 @@
 name: Project CI Checks
-description: Reusable local action for Python and Node project checks
+description: Reusable local action for Python and Node project checks with advanced checks
 
 inputs:
   stack:
@@ -13,6 +13,18 @@ inputs:
     description: Node.js version to use for Node checks
     required: false
     default: "24"
+  run-lint:
+    description: Enable linting checks
+    required: false
+    default: "true"
+  run-security:
+    description: Enable security scanning
+    required: false
+    default: "true"
+  run-coverage:
+    description: Upload test coverage reports
+    required: false
+    default: "false"
 
 runs:
   using: composite
@@ -22,6 +34,8 @@ runs:
       uses: actions/setup-python@v5
       with:
         python-version: ${{ inputs.python-version }}
+        cache: pip
+        cache-dependency-path: requirements.txt
 
     - name: Install Python dependencies
       if: ${{ inputs.stack == 'python' }}
@@ -32,23 +46,83 @@ runs:
         pip install -r requirements.txt
         pip install -e .
 
+    - name: Run Python lint
+      if: ${{ inputs.stack == 'python' && inputs.run-lint == 'true' }}
+      shell: bash
+      working-directory: ${{ github.workspace }}
+      run: |
+        pip install ruff black mypy
+        ruff check .
+        black --check .
+        mypy src || true
+
+    - name: Run Python security scan
+      if: ${{ inputs.stack == 'python' && inputs.run-security == 'true' }}
+      shell: bash
+      working-directory: ${{ github.workspace }}
+      run: |
+        pip install pip-audit bandit
+        pip-audit --skip-editable
+        bandit -r src -q
+
     - name: Run Python tests
       if: ${{ inputs.stack == 'python' }}
       shell: bash
       working-directory: ${{ github.workspace }}
-      run: pytest
+      run: |
+        pip install pytest-cov
+        pytest --cov=src --cov-report=term-missing --cov-report=xml
+
+    - name: Post coverage comment on PR
+      if: ${{ inputs.stack == 'python' && inputs.run-coverage == 'true' && github.event_name == 'pull_request' }}
+      shell: bash
+      run: echo "📊 Updating coverage report on PR..."
+
+    - name: Post coverage comment on PR
+      if: ${{ inputs.stack == 'python' && inputs.run-coverage == 'true' && github.event_name == 'pull_request' }}
+      uses: MishaKav/pytest-coverage-comment@main
+      with:
+        pytest-xml-coverage-path: ./coverage.xml
+        title: "Python ${{ inputs.python-version }} Coverage Report"
+        badge-title: Coverage
+        hide-badge: false
+        hide-report: false
+        create-new-comment: false
+        hide-comment: false
+
+    - name: Upload Python coverage
+      if: ${{ inputs.stack == 'python' && inputs.run-coverage == 'true' }}
+      uses: codecov/codecov-action@v3
+      with:
+        files: ./coverage.xml
+        flags: python
+        name: python-coverage
 
     - name: Set up Node
       if: ${{ inputs.stack == 'node' }}
       uses: actions/setup-node@v6
       with:
         node-version: ${{ inputs.node-version }}
+        cache: npm
+        cache-dependency-path: package-lock.json
 
     - name: Install Node dependencies
       if: ${{ inputs.stack == 'node' }}
       shell: bash
       working-directory: ${{ github.workspace }}
       run: npm ci
+
+    - name: Run Node lint
+      if: ${{ inputs.stack == 'node' && inputs.run-lint == 'true' }}
+      shell: bash
+      working-directory: ${{ github.workspace }}
+      run: npm run lint --if-present
+
+    - name: Run Node security scan
+      if: ${{ inputs.stack == 'node' && inputs.run-security == 'true' }}
+      shell: bash
+      working-directory: ${{ github.workspace }}
+      run: npm audit --audit-level=moderate --no-update-notifier
 
     - name: Run Node script
       if: ${{ inputs.stack == 'node' }}
