@@ -4,7 +4,7 @@ on:
   push:
     branches: ["develop"]
   pull_request:
-    branches: ["develop"]
+    branches: ["develop", "main"]
 
 jobs:
   python-checks:
@@ -29,6 +29,7 @@ jobs:
 
   node-checks:
     runs-on: ubuntu-latest
+    needs: [python-checks]
     strategy:
       matrix:
         node-version: ["20", "22", "24"]
@@ -74,7 +75,7 @@ jobs:
         run: echo "✅ Development job passed after Python and Node checks"
 
   prod:
-    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/develop' }}
+    if: ${{ github.event_name == 'pull_request' && github.base_ref == 'main' }}
     needs: [python-checks, node-checks]
     runs-on: ubuntu-latest
     environment: production
