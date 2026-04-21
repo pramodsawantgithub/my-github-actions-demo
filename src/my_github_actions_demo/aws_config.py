@@ -40,7 +40,11 @@ class AWSConfig:
         if not self.secret_access_key:
             return False, "AWS_SECRET_ACCESS_KEY not set"
         # Temporary STS credentials (ASIA...) require a session token.
-        if self.access_key_id and self.access_key_id.startswith("ASIA") and not self.session_token:
+        if (
+            self.access_key_id
+            and self.access_key_id.startswith("ASIA")
+            and not self.session_token
+        ):
             return False, "AWS_SESSION_TOKEN required for temporary credentials"
         if not self.region:
             return False, "AWS_REGION not set"
