@@ -2,9 +2,6 @@
 AWS Configuration Tests
 """
 
-import os
-import pytest
-
 from my_github_actions_demo.aws_config import AWSConfig, get_aws_config
 
 
